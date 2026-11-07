@@ -16,12 +16,15 @@ export interface TurnRequest {
   readonly model: string;
 }
 
-export interface TurnRecord extends TurnOutput {
+export interface TurnRecord {
   readonly sessionId: string;
   readonly turnIndex: number;
+  text?: string;
+  toolStarts?: TurnOutput['toolStarts'];
+  toolStops?: TurnOutput['toolStops'];
   /** 计量（meter.charge 事件的数据源）。 */
-  readonly tokensIn?: number;
-  readonly tokensOut?: number;
+  tokensIn?: number;
+  tokensOut?: number;
 }
 
 export interface ModelClient {

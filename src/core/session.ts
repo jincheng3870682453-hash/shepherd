@@ -26,9 +26,9 @@ export interface HandleRecord {
 
 /** Host 注入的模型应答（模拟与真实 LLM 共用此形状）。 */
 export interface TurnOutput {
-  readonly text?: string;
-  readonly toolStarts?: ReadonlyArray<{ readonly tool: string; readonly args: unknown; readonly optimistic: boolean }>;
-  readonly toolStops?: ReadonlyArray<{ readonly handle: EventId; readonly reason?: string }>;
+  text?: string | undefined;
+  toolStarts?: ReadonlyArray<{ readonly tool: string; readonly args: unknown; readonly optimistic: boolean }> | undefined;
+  toolStops?: ReadonlyArray<{ readonly handle: EventId; readonly reason?: string }> | undefined;
 }
 
 export interface PendingEvent {

@@ -63,6 +63,7 @@ export type EventType =
   | 'ticket.unsubscribed'
   // Router
   | 'router.dispatched'
+  | 'reply.sent'
   // 会话
   | 'session.started'
   | 'session.ended'
@@ -169,6 +170,34 @@ export interface ToolStartedPayload {
   readonly optimistic: boolean;
 }
 
+export interface TicketOpenedPayload {
+  readonly ticketId: string;
+  readonly thread: string;
+  readonly mandate: string;
+  readonly workerSessionId: string;
+  readonly triggerId: EventId;
+}
+
+export interface TicketEndedPayload {
+  readonly ticketId: string;
+  readonly outcome: 'delivered' | 'failed' | 'dropped';
+  readonly by: string;
+  readonly reason?: string;
+}
+
+export interface ReplySentPayload {
+  readonly ticketId: string;
+  readonly purpose: 'ack' | 'result' | 'attention';
+  readonly text: string;
+  readonly thread: string;
+}
+
+export interface AssessmentOutcomePayload {
+  readonly decision: 'accept' | 'reject';
+  readonly reason?: string;
+  readonly triggerId: EventId;
+}
+
 // ── 按类型取载荷的映射（部分列出，P1 实现时补全） ─────────────────────
 
 export interface EventOfMap {
@@ -180,6 +209,9 @@ export interface EventOfMap {
   'hooh.decided': HoohDecidedPayload;
   'meter.charge': MeterChargePayload;
   'tool.started': ToolStartedPayload;
+  'ticket.opened': TicketOpenedPayload;
+  'ticket.ended': TicketEndedPayload;
+  'reply.sent': ReplySentPayload;
 }
 
 export type EventOf<T extends EventType> = T extends keyof EventOfMap

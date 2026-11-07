@@ -23,26 +23,21 @@
 
 **退路（未动用）**：乐观执行整块推迟到 P4 也不影响本期论点（内核已经全双工）。
 
-## P2 Router/Worker 双层 + 模拟源 ▶（进行中：a/b/c/d 组件完成 2026-11-08，端到端整合待做）
+## P2 Router/Worker 双层 + 模拟源 ✅（2026-11-08 完成）
 
 **内容**：Router（轻模型受理评估+分派）、Worker 池（隔离会话+目录）、订阅直通、Ticket 生命周期、mock-gen 基线剧本（S1）。
 
-**已完成（commits `25f7b1c`、`645ab42`）**：
-- [x] Orchestrator 受理语义（Assessor 注入、opened+ack+dispatched 原子序、直通并入、workerDone）；
-- [x] Ticket 物化视图（事件流重建、重放与运行时视图一致）；
-- [x] mock-gen S1 剧本（20 请求 + 200 噪音、带判分断言）+ 双层端到端（20/20 delivered、全链 HMAC 完好）；
-- [x] DeepSeekModel（真 API 客户端，密钥走环境变量）+ RecordingModel（录制=回放格式）；
-- [x] WorkerPool（4 槽 FIFO 排队/释放弹队首）+ BenchmarkStats（p50/p95/打扰/成本）。
-- 剧本设计约束（实战教训）：噪音与请求共用 Thread 会被订阅直通并入在办 Ticket——直通的正确行为会放大剧本缺陷，模拟源的 Thread 语义必须与真实世界对齐。
+**验收（已完成，commits `25f7b1c`→`005eada`，验证 tests/orchestrator+dual）**：
+- [x] S1 剧本 mock LLM 下完整跑通：220 Trigger → 4 并发 Worker → 20/20 delivered；
+- [x] 四张表第一版出数：p50/p95（seq 差代理）、打扰率（2 条/ticket：ack+result）、成本、交付率；
+- [x] 并发上限真实生效（运行数≤4、FIFO 自动调度）；全链 HMAC 完好；
+- [x] 对照口径冻结：S1 剧本+判分断言即 C 组（上游单 Session+Subagent）的对照基准，mock 模型保证可重复。
+- 实战教训：噪音与请求共用 Thread 会被订阅直通并入在办 Ticket——直通的正确行为会放大剧本缺陷，模拟源的 Thread 语义必须与真实世界对齐。
 
-**待做（e，收尾）**：
-- [ ] Worker 池接入双层端到端（当前测试池与编排是分离的组件；S1 并发版整合跑）；
-- [ ] 四张表第一版从 S1 并发端到端产出；
-- [ ] Router 受理评估换真轻模型（可选：接口已注入式预留，mock 版可先冻结对照口径）。
+**实现落点**：core（orchestrator/tickets/pool）+ adapters（mock-gen/deepseek）+ apps（dual）。
+**注**：Router 受理评估 v1 用确定性规则 mock（Assessor 注入式），真轻模型接入推迟到 P3（与 HooH 一起做真源端到端时一并验证）。
 
-**验收（全项）**：S1 剧本在 mock LLM 下完整跑通，四张表出第一版数字；与上游原型的对照口径冻结。
-
-**退路**：订阅直通可先退化为全经 Router（上游实验证明这主要是省 token 不是提速度）。
+**退路（未动用）**：订阅直通退化方案不需要。
 
 ## P3 HooH 接入 + 真实 GitHub 源
 

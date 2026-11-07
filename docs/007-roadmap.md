@@ -53,8 +53,8 @@
 - 实战记录：手动 completeHandle 与真执行器回调竞速 → 结果 superseded（剧本侧改为等待
   执行器自然结算）；PowerShell here-string 中文乱码 → 脚本关键词 ASCII（裂缝 C-1）。
 
-**待做（d）**：
-- [ ] 入口过滤管线移植件（rule_gate/ambiguity，ADR-004）接进 Orchestrator；
+**待做（d 剩余）**：
+- [x] 入口过滤管线移植件（rule_gate/ambiguity，ADR-004）接进 Orchestrator（commits `aa8f5a6`→`c6a3ae2`，含结构化源旁路）；
 - [ ] 真 PR 工作流（写权限档+授权令签发：issue→分支→commit→PR→评论报告）；
 - [ ] 一次真实 HooH 回滚演示。
 

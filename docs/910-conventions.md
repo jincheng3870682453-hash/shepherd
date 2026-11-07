@@ -37,6 +37,7 @@
 
 ## 6. 测试纪律
 
+- 测试运行器：**Node 内置 `node:test`**（`node --test --experimental-test-isolation=none`），不引入 vitest/jest。原因：vitest→vite→esbuild 链的 esbuild 服务是 stdio 管道子进程，在本项目当前运行环境的沙盒内受 EPERM 限制（2026-11-07 实测）；`node:test` 零第三方依赖、零 spawn，与 910 §2 的零构建脚本立场一致。沙盒限制解除后如需迁移再走 ADR。
 - mock 回放优先：任何单测不得打真 API；
 - 判分器与被测对象隔离：判分器只读总线与 blob，不读 Worker 自述；
 - 每个基准剧本必须有判分断言，无断言剧本不许进 `mock-gen` 主目录。

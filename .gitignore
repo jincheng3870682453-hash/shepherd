@@ -1,0 +1,20 @@
+# 依赖
+node_modules/
+dist/
+
+# 运行时产物（事件库/审计/blob 属于本地数据，不入库）
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# 密钥与本地配置（审计 HMAC 密钥必须在项目外，这里双保险）
+.env
+.env.*
+signing_key*
+
+# 系统
+.DS_Store
+Thumbs.db
+__pycache__/

@@ -1,0 +1,5 @@
+{"seq":1,"kind":"session/start","ts":"2026-11-08 00:32:03","project_root":"G:\\superagnet\\shepherd","cwd":"G:\\superagnet\\shepherd","model":"deepseek-v4-flash","mac":"25ee9158fcd11b27be2c0e61888d159009c5fbeac57b7ba49eb99ca2530387b7"}
+{"seq":2,"kind":"permission/decision","ts":"2026-11-08 00:32:03","tool":"file_read","decision":"allowed","level":"readonly","detail":"","mac":"c2b097c497fca609cd026e88391bb65187935f93872c2199caa070a943a3035c"}
+{"seq":3,"kind":"tool/call","ts":"2026-11-08 00:32:03","tool":"file_read","params":{"path":"README.md"},"mac":"f66c62ee650a2c60dfb6fbd7490a2546b100c3ebb0ff59d307340fc5bae94c5a"}
+{"seq":4,"kind":"tool/result","ts":"2026-11-08 00:32:03","tool":"file_read","status":"success","message":"","elapsed_ms":1,"outcome":"success","mac":"eceefd26050af3e6eb3f162f8b62af15f5a448f894d683671ef2a86dcf5e30b9"}
+{"seq":5,"kind":"guard/verdict","ts":"2026-11-08 00:32:03","rule":"mcp:external agent","action":"allow","detail":"file_read","mac":"72b03df4315a89882b7455435ae20c6c92d4347334c66805d5bc36c4f8a2efd7"}

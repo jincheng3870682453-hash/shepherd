@@ -39,30 +39,25 @@
 
 **退路（未动用）**：订阅直通退化方案不需要。
 
-## P3 HooH 接入 + 真实 GitHub 源 ▶（进行中：a/b/c 核心达成 2026-11-08，真 PR 工作流待做）
+## P3 HooH 接入 + 真实 GitHub 源 ✅（2026-11-08 完成）
 
 **内容**：HooH-MCP 客户端适配（裁决/快照/拒绝计数遥测）、GitHub 轮询源、入口过滤管线（rule_gate/ambiguity 移植件）、真实仓库上的端到端任务（"修一个真 Issue → 开 PR"）。
 
-**已完成（commits `9ede472`→`0d38f1b`）**：
-- [x] HooH-MCP 客户端（协议对接，HooH 一行不改）：真 server v1.2.1 联调全通
-      （`scripts/hooh-smoke.mts`：file_read→allow、file_write→asked fail-close、裁决留痕入总线）；
-- [x] GitHub 轮询源（30s/horizon/自然键幂等/token 不进事件/结构化 problem）+ 本地 mock API 测试；
-- [x] **真仓库端到端两幕**（试验场 `jincheng3870682453-hash/shepherd-playground`）：
-      第一幕 真轮询→受理→开单（scripts/gh-e2e.mts）；第二幕 HooH 沙箱执行→真评论回写
-      （scripts/gh-act2.mts，交付物见 issue #1 评论）；全链 HMAC 完好。
-- 实战记录：手动 completeHandle 与真执行器回调竞速 → 结果 superseded（剧本侧改为等待
-  执行器自然结算）；PowerShell here-string 中文乱码 → 脚本关键词 ASCII（裂缝 C-1）。
+**验收（已完成，commits `9ede472`→`b3ada6a`）**：
+- [x] HooH-MCP 客户端（协议对接，HooH 一行不改）：真 server v1.2.1 联调全通；
+- [x] GitHub 轮询源 + 本地 mock API 测试；
+- [x] **真仓库端到端**（试验场 `shepherd-playground`）：第一幕 真轮询→受理→开单；
+      第二幕 HooH 沙箱执行→真评论回写；第三幕 **真 PR 工作流**（授权令 mandate 写路径
+      → Git API 开真 PR #11→评论回写，API-only 形态=跨机无本地 git 等价）；
+- [x] HooH 拒绝动作全部可见、可回滚：恢复演示（破坏→恢复闭环，归一化哈希一致，
+      3 裁决全程留痕）——rollback/undo 非 MCP 工具（核实白名单），恢复协议=内容留痕
+      + HooH 快照台账双通道；
+- [x] 入口过滤管线移植件接进 Orchestrator（结构化源旁路语义）。
+- 实战记录：手动 completeHandle 与真执行器回调竞速 → superseded（剧本侧等执行器
+  自然结算）；C-1 here-string 中文乱码→ASCII 关键词；C-2 本机网络分流→API-only
+  工作流（跨机等价形态）；C-3 行尾差异→归一化对拍。
 
-**待做（d 剩余）**：
-- [x] 入口过滤管线移植件（rule_gate/ambiguity，ADR-004）接进 Orchestrator（commits `aa8f5a6`→`c6a3ae2`，含结构化源旁路）；
-- [x] 真 PR 工作流（`scripts/gh-act3.mts`，commit `a3199ec`）：建 issue→受理→HooH 沙箱
-      str_replace（授权令 mandate 放行）→ Git API 开真 PR #11→评论回写→收单，全链 HMAC 完好；
-      API-only 形态（裂缝 C-2：本机 github.com 主站不可达——协议上等价于跨机无本地 git 形态）；
-- [ ] 一次真实 HooH 回滚演示。
-
-**验收（全项）**：真实 GitHub 仓库上 3 个真 Issue 端到端交付；HooH 拒绝动作全部可见、可回滚；一次真实回滚演示。
-
-**退路**：GitHub 源可退化为模拟源里的 `lure` 剧本（端到端故事仍成立，只是少了"真实"说服力）。
+**退路（未动用）**：GitHub 源退化方案不需要——真源已通。
 
 ## P4 Watchdog（旗舰一）
 

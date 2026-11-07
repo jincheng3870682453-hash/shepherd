@@ -1,0 +1,20 @@
+{
+  "name": "shepherd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "事件驱动的超智能体编排层原型（编排层内核；入口过滤与出口裁决复用 jcf/HooH）",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-test-isolation=none \"tests/**/*.spec.ts\"",
+    "build": "tsc -p tsconfig.build.json",
+    "check": "pnpm run typecheck && pnpm run test"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}

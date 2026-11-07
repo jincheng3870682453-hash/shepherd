@@ -1,0 +1,4 @@
+# Shepherd 零构建脚本立场（docs/910-conventions.md §2）：依赖一律不跑生命周期脚本。
+# esbuild 的 postinstall 仅是可选回退校验，Windows 二进制在 @esbuild/win32-x64，跳过不影响功能。
+ignoreScripts: true
+verifyDepsBeforeRun: false

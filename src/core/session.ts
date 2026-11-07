@@ -36,6 +36,8 @@ export interface PendingEvent {
   readonly kind: 'tool.result' | 'tool.cancelled' | 'injected';
   readonly handle?: EventId | undefined;
   readonly payload: unknown;
+  /** 该事件在总线上的 id（因果链回填用；adapters 层投递时携带）。 */
+  readonly eventId?: EventId | undefined;
 }
 
 export interface SessionHost {
@@ -84,8 +86,8 @@ export class Session {
   }
 
   /** 步间注入：结果事件进入待合并队列（P1 中由外部在事件到达时调用）。 */
-  deliver(seq: number, kind: PendingEvent['kind'], handle: EventId | undefined, payload: unknown): void {
-    this.pending.push({ seq, kind, handle, payload });
+  deliver(seq: number, kind: PendingEvent['kind'], handle: EventId | undefined, payload: unknown, eventId?: EventId): void {
+    this.pending.push({ seq, kind, handle, payload, eventId });
     this.pending.sort((a, b) => a.seq - b.seq);
     if (this.status === 'idle') this.status = 'awaiting_results';
   }

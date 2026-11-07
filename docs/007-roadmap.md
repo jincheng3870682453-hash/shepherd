@@ -39,11 +39,26 @@
 
 **退路（未动用）**：订阅直通退化方案不需要。
 
-## P3 HooH 接入 + 真实 GitHub 源
+## P3 HooH 接入 + 真实 GitHub 源 ▶（进行中：a/b/c 核心达成 2026-11-08，真 PR 工作流待做）
 
 **内容**：HooH-MCP 客户端适配（裁决/快照/拒绝计数遥测）、GitHub 轮询源、入口过滤管线（rule_gate/ambiguity 移植件）、真实仓库上的端到端任务（"修一个真 Issue → 开 PR"）。
 
-**验收**：真实 GitHub 仓库上 3 个真 Issue 端到端交付；HooH 拒绝动作全部可见、可回滚；一次真实回滚演示。
+**已完成（commits `9ede472`→`0d38f1b`）**：
+- [x] HooH-MCP 客户端（协议对接，HooH 一行不改）：真 server v1.2.1 联调全通
+      （`scripts/hooh-smoke.mts`：file_read→allow、file_write→asked fail-close、裁决留痕入总线）；
+- [x] GitHub 轮询源（30s/horizon/自然键幂等/token 不进事件/结构化 problem）+ 本地 mock API 测试；
+- [x] **真仓库端到端两幕**（试验场 `jincheng3870682453-hash/shepherd-playground`）：
+      第一幕 真轮询→受理→开单（scripts/gh-e2e.mts）；第二幕 HooH 沙箱执行→真评论回写
+      （scripts/gh-act2.mts，交付物见 issue #1 评论）；全链 HMAC 完好。
+- 实战记录：手动 completeHandle 与真执行器回调竞速 → 结果 superseded（剧本侧改为等待
+  执行器自然结算）；PowerShell here-string 中文乱码 → 脚本关键词 ASCII（裂缝 C-1）。
+
+**待做（d）**：
+- [ ] 入口过滤管线移植件（rule_gate/ambiguity，ADR-004）接进 Orchestrator；
+- [ ] 真 PR 工作流（写权限档+授权令签发：issue→分支→commit→PR→评论报告）；
+- [ ] 一次真实 HooH 回滚演示。
+
+**验收（全项）**：真实 GitHub 仓库上 3 个真 Issue 端到端交付；HooH 拒绝动作全部可见、可回滚；一次真实回滚演示。
 
 **退路**：GitHub 源可退化为模拟源里的 `lure` 剧本（端到端故事仍成立，只是少了"真实"说服力）。
 

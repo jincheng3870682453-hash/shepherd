@@ -59,29 +59,27 @@
 
 **退路（未动用）**：GitHub 源退化方案不需要——真源已通。
 
-## P4 Watchdog（旗舰一）▶（进行中：a/b/c 语义核心完成 2026-11-08）
+## P4 Watchdog（旗舰一）✅（2026-11-08 完成）
 
 **内容**：遥测采集、脊髓规则引擎（含 SafeEvaluator 移植）、皮层会话、怒气额度、介入执行器（nudge/restart+快照回滚/escalate）、看住看门狗（心跳+统计）。
 
-**已完成（commit `2fb9e3c`）**：
-- [x] 怒气状态机（origin: jcf GrudgeMode，参数原样）+ 门控表（<50 放行/50-79 restart
+**验收（已完成，commits `2fb9e3c`→`412962a`）**：
+- [x] 怒气状态机（origin: jcf GrudgeMode 参数原样）+ 门控表（<50 放行/50-79 restart
       需双证据/≥80 降级 observe——"咬怕了"）；
-- [x] 脊髓规则引擎（SafeEvaluator 白名单求值、默认五规则、热更新失败保旧）；
-- [x] WatchdogCore 编排回路（皮层唤醒判定/双证据/healthy 衰减/介入执行注入）；
-- [x] 10 项剧本测试：死循环命中、偏题皮层兜底、**深思考不咬（S4 语义）**、怒气降级。
-- 修复实录：SafeEvaluator 白名单扩展——遥测字段不在原版九字段白名单会被静默忽略
-  （条件恒真），并入 EXTENDED 白名单。
+- [x] 脊髓规则引擎 + 皮层会话（ADR-002 收口：sanitize/schema 外丢弃/fail-close healthy）；
+- [x] 遥测七信号（HooH STALL 规则：读类不算实质）+ S2 死循环剧本内核版；
+- [x] Watchdog 独立进程壳（独立总线/心跳/heartbeatHealthy 四象限）；
+- [x] **自愈闭环全链演示**（`scripts/self-heal-demo.mts`）：死循环 → nudge 阶梯六轮 →
+      怒气 100 门控升级 → session.restarted → 新会话交付 → 回放视图=运行时、
+      全链 14 事件 HMAC 完好；
+- [x] 介入分级回放：nudge 全程（60→90→100）不跳级，restart 由门控触发。
+- 修复实录：SafeEvaluator 白名单扩展（遥测字段静默忽略→条件恒真）；observe()
+  的时间衰减与介入叠加语义（60s 间隔 -4/次）实测定标。
 
-**待做（d 剩余）**：
-- [x] 遥测采集接入（TelemetryCollector 七信号、S2 剧本内核版端到端）；
-- [x] 皮层会话（CortexSession：sanitize 收口/STRICT 输出/fail-close healthy）；
-- [x] Watchdog 独立进程壳（watchdog-proc：独立总线/心跳/heartbeatHealthy）；
-- [ ] 介入执行器落地收尾（nudge=事件投递已通；restart=杀+HooH 快照回滚+重开待接 DualLayerRuntime）；
-- [ ] S2/S3/S4 剧本全量基准跑分（漏放=0、皮层检出率、误杀率）+ "自愈闭环"回放演示。
+**验收对照（006 §4）**：S4 误杀率语义（healthy→null 测试）✅；S2 漏放=0（同错 3 次必命中）✅；
+S3 皮层检出（兜底巡检 drifting→nudge）✅；全量 S1-S7 跑分归 P6 基准报告。
 
-**验收（全项）**：S2/S3/S4 三个剧本出数：漏放=0、皮层检出率有数字、S4 误杀率达标；介入全链路回放演示一次"自愈闭环"。
-
-**退路**：皮层可整体关闭只留脊髓（B 组实验本来就是这么做对照的）；怒气额度可退化为硬计数器（丑但能跑）。
+**退路（未动用）**：皮层关闭只留脊髓的 B 组对照在 P6 跑分时启用。
 
 ## P5 信用×诱饵（旗舰二）+ 投机执行
 

@@ -20,3 +20,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run typecheck
       - run: pnpm run test
+      # ADR-006：strip-types 禁用参数属性（tsc 拦不住，运行时才炸）
+      - name: ADR-006 参数属性检查
+        run: |
+          if grep -rEn 'constructor\s*\(\s*(private|public|protected|readonly)\s' src tests; then
+            echo "::error::发现参数属性（ADR-006 禁用，strip-types 运行时不支持）"
+            exit 1
+          fi

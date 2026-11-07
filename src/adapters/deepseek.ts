@@ -72,8 +72,11 @@ export class DeepSeekModel implements ModelClient {
 /** 录制器：包住任何 ModelClient，把每轮输出存为可回放记录。 */
 export class RecordingModel implements ModelClient {
   readonly records: TurnRecord[] = [];
+  private readonly inner: ModelClient;
 
-  constructor(private readonly inner: ModelClient) {}
+  constructor(inner: ModelClient) {
+    this.inner = inner;
+  }
 
   async turn(req: TurnRequest): Promise<TurnRecord> {
     const out = await this.inner.turn(req);

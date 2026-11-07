@@ -242,6 +242,16 @@ const ALLOWED_FIELDS = new Set([
   'length', 'special_char_ratio', 'repeated_char_ratio', 'no_real_word', 'has_real_word',
   'real_word_count', 'hesitation_count', 'is_all_caps', 'digit_ratio',
 ]);
+/**
+ * 扩展白名单（P4 Watchdog 脊髓遥测 + 信用/怒气，docs/003 §3）——
+ * SafeEvaluator 是同一求值器，白名单按用途合并；白名单外一律忽略（原版语义）。
+ */
+export const EXTENDED_ALLOWED_FIELDS = new Set([
+  ...ALLOWED_FIELDS,
+  'reportGapMs', 'sameErrorStreak', 'fileEditRepeat', 'tokenSlope',
+  'hoohDenyStreak', 'turnNoToolStreak', 'handleOrphans',
+  'credit', 'anger',
+]);
 const COND_TOKEN_RE = /^\s*(\w+)\s*(>|<|>=|<=|==|!=)\s*([\d.]+)\s*$/;
 
 /** 极简表达式：field op num (AND|OR field op num)*。白名单外字段直接忽略该子句。 */
@@ -259,7 +269,7 @@ export function safeEvalCondition(condition: string, ctx: FeatureContext): boole
     const field = m[1]!;
     const op = m[2]!;
     const value = Number(m[3]);
-    if (!ALLOWED_FIELDS.has(field)) continue; // 白名单外忽略（原版语义）
+    if (!EXTENDED_ALLOWED_FIELDS.has(field)) continue; // 白名单外忽略（原版语义）
     const fv = (ctx as unknown as Record<string, unknown>)[field];
     const fvNum = typeof fv === 'boolean' ? (fv ? 1 : 0) : typeof fv === 'number' ? fv : 0;
     const r = op === '>' ? fvNum > value : op === '<' ? fvNum < value : op === '>=' ? fvNum >= value : op === '<=' ? fvNum <= value : op === '==' ? fvNum === value : fvNum !== value;

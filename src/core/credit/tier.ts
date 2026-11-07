@@ -160,4 +160,17 @@ export class CreditEngine {
   current(entity: string, nowMs: number): number {
     return this.get(entity, nowMs).cur;
   }
+
+  /** 信用变化事件草稿（CreditLink 用；core 产 draft，adapters 落总线）。 */
+  draftCreditChanged(entity: string, cur: number, base: number, delta: number, id: string, causedBy: string): import('../events.ts').EventDraft<'credit.changed'> {
+    return {
+      id,
+      type: 'credit.changed',
+      ts: new Date().toISOString(),
+      ingestedAt: new Date().toISOString(),
+      producer: 'credit-engine',
+      causedBy,
+      payload: { entity, delta, curAfter: cur, baseAfter: base },
+    } as unknown as import('../events.ts').EventDraft<'credit.changed'>;
+  }
 }

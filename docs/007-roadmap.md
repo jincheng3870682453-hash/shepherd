@@ -55,7 +55,9 @@
 
 **待做（d 剩余）**：
 - [x] 入口过滤管线移植件（rule_gate/ambiguity，ADR-004）接进 Orchestrator（commits `aa8f5a6`→`c6a3ae2`，含结构化源旁路）；
-- [ ] 真 PR 工作流（写权限档+授权令签发：issue→分支→commit→PR→评论报告）；
+- [x] 真 PR 工作流（`scripts/gh-act3.mts`，commit `a3199ec`）：建 issue→受理→HooH 沙箱
+      str_replace（授权令 mandate 放行）→ Git API 开真 PR #11→评论回写→收单，全链 HMAC 完好；
+      API-only 形态（裂缝 C-2：本机 github.com 主站不可达——协议上等价于跨机无本地 git 形态）；
 - [ ] 一次真实 HooH 回滚演示。
 
 **验收（全项）**：真实 GitHub 仓库上 3 个真 Issue 端到端交付；HooH 拒绝动作全部可见、可回滚；一次真实回滚演示。

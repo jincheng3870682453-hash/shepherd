@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, afterEach } from 'node:test';
+﻿import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -31,7 +31,7 @@ describe('P2-a Router/Worker 双层：受理与 Ticket 生命周期（docs/002 �
     const orch = new Orchestrator(bus, { assessor: ruleAssessor });
     const r = bus.append(bus.root('source.trigger.received', 'mock-gen', { thread: 'th1', kind: 'request', text: '修 bug' }, 'trg1'), 'k1');
     assert.ok(r.kind === 'stored');
-    const ticketId = orch.onTrigger(r.event.seq, r.event.id, 'th1', 'request', '修 bug');
+    const ticketId = orch.onTrigger(r.event.seq, r.event.id, 'th1', 'request', '修 bug', true);
     assert.ok(ticketId !== null);
     const t = orch.view.byId.get(ticketId)!;
     assert.equal(t.status, 'working');
@@ -58,7 +58,7 @@ describe('P2-a Router/Worker 双层：受理与 Ticket 生命周期（docs/002 �
     const bus = new SqliteBus(join(dir, 'ev.db'), 'k');
     const orch = new Orchestrator(bus, { assessor: ruleAssessor });
     const r1 = bus.append(bus.root('source.trigger.received', 'mock-gen', { thread: 'th3', kind: 'request', text: '任务A' }, 'trg3a'), 'k3a');
-    const id1 = orch.onTrigger((r1 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r1 as { kind: 'stored'; event: { id: string } }).event.id, 'th3', 'request', '任务A');
+    const id1 = orch.onTrigger((r1 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r1 as { kind: 'stored'; event: { id: string } }).event.id, 'th3', 'request', '任务A', true);
     assert.ok(id1 !== null);
     const r2 = bus.append(bus.root('source.trigger.received', 'mock-gen', { thread: 'th3', kind: 'request', text: '补充：还要加测试' }, 'trg3b'), 'k3b');
     const id2 = orch.onTrigger((r2 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r2 as { kind: 'stored'; event: { id: string } }).event.id, 'th3', 'request', '补充：还要加测试');
@@ -72,13 +72,13 @@ describe('P2-a Router/Worker 双层：受理与 Ticket 生命周期（docs/002 �
     const bus = new SqliteBus(join(dir, 'ev.db'), 'k');
     const orch = new Orchestrator(bus, { assessor: ruleAssessor });
     const r1 = bus.append(bus.root('source.trigger.received', 'mock-gen', { thread: 'th4', kind: 'request', text: '任务B' }, 'trg4a'), 'k4a');
-    const id1 = orch.onTrigger((r1 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r1 as { kind: 'stored'; event: { id: string } }).event.id, 'th4', 'request', '任务B');
+    const id1 = orch.onTrigger((r1 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r1 as { kind: 'stored'; event: { id: string } }).event.id, 'th4', 'request', '任务B', true);
     assert.ok(id1 !== null);
     orch.workerDone(id1, 'delivered', 'PR #1 已开', `tkt_${id1}`);
     assert.equal(orch.view.byId.get(id1)!.status, 'done');
     // 新请求 → 新 Ticket
     const r2 = bus.append(bus.root('source.trigger.received', 'mock-gen', { thread: 'th4', kind: 'request', text: '任务C' }, 'trg4b'), 'k4b');
-    const id2 = orch.onTrigger((r2 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r2 as { kind: 'stored'; event: { id: string } }).event.id, 'th4', 'request', '任务C');
+    const id2 = orch.onTrigger((r2 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r2 as { kind: 'stored'; event: { id: string } }).event.id, 'th4', 'request', '任务C', true);
     assert.ok(id2 !== null && id2 !== id1);
     bus.close();
   });
@@ -87,7 +87,7 @@ describe('P2-a Router/Worker 双层：受理与 Ticket 生命周期（docs/002 �
     const bus = new SqliteBus(join(dir, 'ev.db'), 'k');
     const orch = new Orchestrator(bus, { assessor: ruleAssessor });
     const r1 = bus.append(bus.root('source.trigger.received', 'mock-gen', { thread: 'th5', kind: 'request', text: '任务D' }, 'trg5'), 'k5');
-    const id1 = orch.onTrigger((r1 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r1 as { kind: 'stored'; event: { id: string } }).event.id, 'th5', 'request', '任务D');
+    const id1 = orch.onTrigger((r1 as { kind: 'stored'; event: { seq: number; id: string } }).event.seq, (r1 as { kind: 'stored'; event: { id: string } }).event.id, 'th5', 'request', '任务D', true);
     orch.workerDone(id1!, 'delivered', '完成', `tkt_${id1}`);
     // 重放
     const rebuilt = rebuildTickets(bus.allEvents().map(e => ({ seq: e.seq, type: e.type, payload: e.payload })));

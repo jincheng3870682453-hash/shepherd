@@ -14,6 +14,14 @@ import type { BusLike } from '../apps/runner.ts';
 import type { EventId } from './events.ts';
 import type { TicketView } from './tickets.ts';
 import { applyTicketEvent, newTicketView, rebuildTickets } from './tickets.ts';
+import { RuleGate } from './filter/rule-gate.ts';
+import { AmbiguityRouter } from './filter/ambiguity.ts';
+
+/** 入口过滤结果（Orchestrator.onTrigger 的三路出口）。cleaned = 截断/清洗后的文本。 */
+export type IntakeVerdict =
+  | { readonly action: 'filtered'; readonly stage: 'rule_gate' | 'ambiguity'; readonly reason: string }
+  | { readonly action: 'clarify'; readonly reason: string; readonly prompt: string }
+  | { readonly action: 'assess'; readonly cleaned: string };
 
 export interface AssessInput {
   readonly triggerId: EventId;
@@ -36,6 +44,9 @@ export class Orchestrator {
   private readonly bus: BusLike;
   private readonly opts: OrchestratorOptions;
   readonly view: TicketView = newTicketView();
+  /** 入口过滤管线（P3-d 接入：rule_gate → ambiguity，jcf 移植件）。 */
+  readonly ruleGate: RuleGate;
+  readonly ambiguity: AmbiguityRouter;
   private ticketCount = 0;
   /** thread → worker session id（订阅直通表）。 */
   private readonly subscriptions = new Map<string, string>();
@@ -43,10 +54,45 @@ export class Orchestrator {
   constructor(bus: BusLike, opts: OrchestratorOptions) {
     this.bus = bus;
     this.opts = opts;
+    this.ruleGate = new RuleGate();
+    this.ambiguity = new AmbiguityRouter();
+  }
+
+  /**
+   * 入口过滤管线（jcf 移植件接线，docs/005 §3）：
+   *   rule_gate（Fast Path）→ ambiguity 三路 → 受理评估（Slow Path）
+   * GIBBERISH → intake.filtered{stage: rule_gate|ambiguity}；
+   * HIGH → clarify（返回追问话术，不产事件——P5 接轻模型后产 reply.sent）；
+   * LOW/PASS → 走 assessor 慢路径。
+   *
+   * 旁路（bypassAssess）：结构与上游一致——上游程序层（rule_gate/ambiguity）筛掉的
+   * 是"不值得消耗模型"的；但 GitHub Issue/PR 这类结构化源自带强信号（已经是工单），
+   * 跳过模糊度分流直接进受理评估（github_scout 语义：工单不该被当聊天过滤）。
+   */
+  intake(triggerId: EventId, text: string, structured: boolean = false): IntakeVerdict {
+    const gate = this.ruleGate.evaluate(text);
+    if (gate.action === 'BLOCK') {
+      this.appendEvent('intake.filtered', 'router', { reason: `rule_gate:${gate.matchedRule}:${gate.reason}`, stage: 'rule_gate' }, triggerId);
+      return { action: 'filtered', stage: 'rule_gate', reason: gate.reason };
+    }
+    let cleaned = gate.cleanedText;
+    if (gate.action === 'TRUNCATE') cleaned = gate.cleanedText;
+    if (!structured) {
+      const route = this.ambiguity.route(cleaned);
+      if (route.level === 'GIBBERISH') {
+        this.appendEvent('intake.filtered', 'router', { reason: `ambiguity:${route.reason}`, stage: 'ambiguity' }, triggerId);
+        return { action: 'filtered', stage: 'ambiguity', reason: route.reason };
+      }
+      if (route.level === 'HIGH') {
+        const prompt = this.ambiguity.generateClarifyPrompt(cleaned, route);
+        return { action: 'clarify', reason: route.reason, prompt };
+      }
+    }
+    return { action: 'assess', cleaned };
   }
 
   /** 入口：一个 Trigger 到达 Router。产受理或拒绝事件；返回 ticketId 或 null。 */
-  onTrigger(triggerSeq: number, triggerId: EventId, thread: string, kind: string, text: string): string | null {
+  onTrigger(triggerSeq: number, triggerId: EventId, thread: string, kind: string, text: string, structured: boolean = false): string | null {
     // 直通检查：该 Thread 已有在办 Ticket → 不再评估，直接归属（002 §4 订阅直通）
     const existing = this.subscriptions.get(thread);
     if (existing !== undefined && this.view.byId.get(existing)?.status === 'working') {
@@ -55,7 +101,15 @@ export class Orchestrator {
       return existing;
     }
 
-    const verdict = this.opts.assessor({ triggerId, thread, kind, text, fromWorker: false });
+    // 入口过滤管线（P3-d）：结构化源（GitHub）旁路模糊分流；BLOCK/GIBBERISH 过滤、HIGH 澄清不受理
+    const intake = this.intake(triggerId, text, structured);
+    if (intake.action === 'filtered') return null;
+    if (intake.action === 'clarify') {
+      this.appendEvent('intake.filtered', 'router', { reason: `clarify:${intake.reason}`, stage: 'ambiguity' }, triggerId);
+      return null;
+    }
+
+    const verdict = this.opts.assessor({ triggerId, thread, kind, text: intake.cleaned, fromWorker: false });
     if (!verdict.accept) {
       this.appendEvent('intake.filtered', 'router', { reason: verdict.reason, stage: 'router_assess' }, triggerId);
       return null;

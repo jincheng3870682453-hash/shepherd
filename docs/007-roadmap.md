@@ -72,12 +72,12 @@
 - 修复实录：SafeEvaluator 白名单扩展——遥测字段不在原版九字段白名单会被静默忽略
   （条件恒真），并入 EXTENDED 白名单。
 
-**待做（d）**：
-- [ ] 遥测采集接入 SessionRunner（003 §2 七信号从内核事件推导）；
-- [ ] 皮层真 LLM 会话（独立进程，输入 schema 校验超字段即丢）；
-- [ ] 介入执行器落地（nudge=事件投递、restart=杀+HooH 快照回滚+重开、escalate=面板置顶）；
-- [ ] 看住看门狗（心跳+介入统计仪表盘）；
-- [ ] S2/S3/S4 剧本基准跑分（漏放=0、皮层检出率、误杀率）。
+**待做（d 剩余）**：
+- [x] 遥测采集接入（TelemetryCollector 七信号、S2 剧本内核版端到端）；
+- [x] 皮层会话（CortexSession：sanitize 收口/STRICT 输出/fail-close healthy）；
+- [x] Watchdog 独立进程壳（watchdog-proc：独立总线/心跳/heartbeatHealthy）；
+- [ ] 介入执行器落地收尾（nudge=事件投递已通；restart=杀+HooH 快照回滚+重开待接 DualLayerRuntime）；
+- [ ] S2/S3/S4 剧本全量基准跑分（漏放=0、皮层检出率、误杀率）+ "自愈闭环"回放演示。
 
 **验收（全项）**：S2/S3/S4 三个剧本出数：漏放=0、皮层检出率有数字、S4 误杀率达标；介入全链路回放演示一次"自愈闭环"。
 

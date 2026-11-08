@@ -1,13 +1,13 @@
-# Shepherd
+﻿# Shepherd
 
 [![CI](https://github.com/jincheng3870682453-hash/shepherd/actions/workflows/ci.yml/badge.svg)](https://github.com/jincheng3870682453-hash/shepherd/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Runtime deps](https://img.shields.io/badge/runtime%20deps-zero-orange.svg)](package.json)
 [![Node](https://img.shields.io/badge/Node-24-339933.svg)](package.json)
 
-> **事件驱动的超智能体编排层原型**：把"一直在岗、并行推进、主动找活、出事自愈"做成机制，而不是口号。
+> **基于 DeepSeek 开源的 Super-agent 项目做的微型 demo**：把"一直在岗、并行推进、主动找活、出事自愈"做成可运行、可测试的最小实现。
 >
-> 定位：**DeepSeek《Super-agent》文章描述的架构，补上它原型里没实现的那四块**——外部看门狗、投机执行、信用×诱饵验证、异步 ReAct 默认开启。独立实现，不基于上游代码；MIT，零第三方运行时依赖。
+> 定位：跟着 DeepSeek《Super-agent》文章与开源原型做的一个**微型 demo**——把它原型里标注为"未来方向"的四块（外部看门狗、投机执行、信用×诱饵验证、异步 ReAct 默认开启）做成可跑的最小闭环。独立实现（未复制上游代码）；MIT，零第三方运行时依赖。
 
 ## 30 秒看懂它想证明什么
 

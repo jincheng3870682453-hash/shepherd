@@ -1,12 +1,12 @@
-# 宣传物料（发布用，2026-11-08）
+﻿# 宣传物料（发布用，2026-11-08）
 
 > 背景：上游 `dsh-superagent-prototype` 的 issues/discussions **均被关闭**（实测：`has_issues:false, has_discussions:false`，仓库未归档、11-03 有推送）——官方反馈通道不存在，按 B 计划执行：改介绍文件 + 备宣传。
 
 ## 一、一句话介绍
 
-**中文**：DeepSeek 说 Super-agent 要补四块拼图（看门狗/投机执行/信用验证/全双工），我们把这四块焊成了一个能跑、能测、能回放的原型——零第三方依赖，108 项测试。
+**中文**：基于 DeepSeek 开源的 Super-agent 项目思路，做了一个**微型 demo**：把他们标注为"未来方向"的四块（看门狗/投机执行/信用验证/全双工）焊成能跑、能测、能回放的最小实现——零第三方依赖，108 项测试。
 
-**English**: DeepSeek's Super-agent article named four missing pieces — an external watchdog, speculative execution, credit-based verification, and async ReAct. Shepherd implements all four as a runnable, testable, replayable prototype: zero runtime deps, 108 tests, MIT.
+**English**: A micro demo based on DeepSeek's open-sourced Super-agent prototype: implements the four pieces the article lists as future work — external watchdog, speculative execution, credit × bait verification, async ReAct — as a runnable, testable, replayable minimal demo. Zero runtime deps, 108 tests, MIT.
 
 ## 二、长文导语（GitHub/博客开头）
 

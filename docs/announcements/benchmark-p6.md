@@ -1,4 +1,4 @@
-# Shepherd 基准报告（P6 v1.1，mock LLM 版）
+﻿# Shepherd 基准报告（P6 v1.1，mock LLM 版）
 
 生成时间：2026-11-08（v1.1：C 组对照补完）
 
@@ -62,3 +62,18 @@
 1. mock LLM 版数字只证明**机制成立**与**架构对照成立**，不证明真实模型下的效果分布——真实 API 复跑归后续；
 2. C 组复刻是行为级（串行阻塞/委派税两个形态），非逐行源码复刻——对照口径已冻结在 `scripts/c-baseline.mts`；
 3. S7 的 20+ 投机机会全量统计待真实窗口扩容。
+## 真模型冒烟（v1.2 补录，2026-11-08）
+
+| 检查 | 结果 | 说明 |
+|------|------|------|
+| 皮层三值判断 | ✅ spinning | 真模型 evidence："sameErrorStreak 1→3→5 且无其他进展信号变化" |
+| 受理评估·任务 | ✅ ACCEPT | 真 bug 报告正确受理 |
+| 受理评估·闲聊 | ✅ REJECT | 天气/午饭话题正确拒绝 |
+| 受理评估·模糊 | ✅ CLARIFY | "那个东西不太对" 正确要求澄清 |
+| 成本 | 4 次调用 / 750 in + 113 out tokens / ~3s | 逐轮录制：docs/recordings/real-api-smoke-*.jsonl |
+
+**结论**：机制在真实 DeepSeek 模型下成立；冒烟暴露并修复了 2 个真 bug——
+① 逻辑角色名（watchdog-cortex）被直接拼进 API model 字段（HTTP 400）；
+② RecordingModel 丢失 token 计量。修复后 4/4 检查通过，录制样本可直接用 ReplayModel 回放。
+
+**仍待**：全量 S1-S7 真实 API 复跑（成本/time 另计）、20+ 投机机会全量统计。

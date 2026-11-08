@@ -41,12 +41,15 @@ export class DeepSeekModel implements ModelClient {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
+      // 逻辑角色名（mock/router/worker/watchdog-cortex）→ 真实模型名（role-models 映射的简化版）
+      const logical = new Set(['mock', 'router', 'worker', 'watchdog-cortex', 'assessor']);
+      const modelName = logical.has(req.model) ? this.model : req.model;
       const res = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiKey}` },
         signal: controller.signal,
         body: JSON.stringify({
-          model: req.model === 'mock' ? this.model : req.model,
+          model: modelName,
           messages: req.messages,
         }),
       });
@@ -80,15 +83,21 @@ export class RecordingModel implements ModelClient {
 
   async turn(req: TurnRequest): Promise<TurnRecord> {
     const out = await this.inner.turn(req);
+    const usage = out as unknown as { tokensIn?: number; tokensOut?: number };
     const rec: TurnRecord = { sessionId: req.sessionId, turnIndex: req.turnIndex };
     if (out.text !== undefined) rec.text = out.text;
     if (out.toolStarts !== undefined) rec.toolStarts = out.toolStarts;
     if (out.toolStops !== undefined) rec.toolStops = out.toolStops;
+    // 计量透传（meter.charge 数据源——原实现漏了这两个字段）
+    if (usage.tokensIn !== undefined) rec.tokensIn = usage.tokensIn;
+    if (usage.tokensOut !== undefined) rec.tokensOut = usage.tokensOut;
     this.records.push(rec);
     const returned: TurnRecord = { sessionId: req.sessionId, turnIndex: req.turnIndex };
     if (out.text !== undefined) returned.text = out.text;
     if (out.toolStarts !== undefined) returned.toolStarts = out.toolStarts;
     if (out.toolStops !== undefined) returned.toolStops = out.toolStops;
+    if (usage.tokensIn !== undefined) returned.tokensIn = usage.tokensIn;
+    if (usage.tokensOut !== undefined) returned.tokensOut = usage.tokensOut;
     return returned;
   }
 

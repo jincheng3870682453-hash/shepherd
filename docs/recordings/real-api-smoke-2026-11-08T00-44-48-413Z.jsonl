@@ -1,0 +1,4 @@
+{"sessionId":"cortex-real-smoke","turnIndex":0,"text":"VERDICT: spinning\n\nEVIDENCE: sameErrorStreak rose 1→3→5 with zero other progress signals changing; fileEditRepeat=2 and flat tokenSlope=800 indicate repeated identical failures without substantive fixes.","tokensIn":342,"tokensOut":48}
+{"sessionId":"assess-alice","turnIndex":0,"text":"DECISION: ACCEPT\nREASON: Concrete bug report with fix and regression test request.","tokensIn":148,"tokensOut":19}
+{"sessionId":"assess-bob","turnIndex":0,"text":"DECISION: REJECT\nREASON: Casual chit-chat unrelated to coding work.","tokensIn":132,"tokensOut":19}
+{"sessionId":"assess-carol","turnIndex":0,"text":"DECISION: CLARIFY\nREASON: Vague complaint (\"that thing isn't right\") with no specific target or task.","tokensIn":128,"tokensOut":27}

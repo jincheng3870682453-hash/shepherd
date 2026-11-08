@@ -70,5 +70,5 @@
 - [x] 仓库公开：github.com/jincheng3870682453-hash/shepherd（CI 绿）
 - [x] README 宣传版（本文件配套）
 - [ ] 社交发布（推特/X、即刻、V2EX、掘金、Reddit r/LocalLLaMA）——按平台裁剪上文
-- [ ] awesome-list issue 探路（可选）
+- [x] awesome-list PR 已提交：#796（deepseek-ai/awesome-deepseek-integration，AI Agent frameworks 分类）
 - [ ] 若官方后续开放通道：再把 issue 正文（docs/upstream-issue.md）转投
